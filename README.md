@@ -16,13 +16,9 @@ Chrome 版本 83.0.4103.106（正式版本） （64 位）
 2. **需要登录后才能从后台获取数据 预设登录账号为：**** test **** 密码为： **** test**
 
 ### 需求分析
-
-![](RackMultipart20210708-4-1yaem2y_html_692fccebfa32490f.gif)
-
-![](RackMultipart20210708-4-1yaem2y_html_ea01d401b85fe9d.gif)
-
-![](RackMultipart20210708-4-1yaem2y_html_e4ecd66e03dce26.gif)
-
+![1](https://user-images.githubusercontent.com/58978356/124966811-4edf5300-e056-11eb-9dd5-a07db67ada99.PNG)
+![2](https://user-images.githubusercontent.com/58978356/124966830-530b7080-e056-11eb-8f21-784bab4e7149.PNG)
+![3](https://user-images.githubusercontent.com/58978356/124966846-56066100-e056-11eb-8fac-e3180fc406e7.PNG)
 ### 数据库设计
 
 **库名：**** myshop**
@@ -545,31 +541,29 @@ captcha 验证码
 ### 页面设计
 
 #### 登录页面
-
-![](RackMultipart20210708-4-1yaem2y_html_e15a0ae82546645d.png)
+![image](https://user-images.githubusercontent.com/58978356/124966920-68809a80-e056-11eb-9f5f-448b1e3f1ba9.png)
 
 #### 后台首页
 
-![](RackMultipart20210708-4-1yaem2y_html_48d2c9b3fbdedd42.png)
+![image](https://user-images.githubusercontent.com/58978356/124966954-71716c00-e056-11eb-92be-ec95867020dc.png)
 
 #### 商品列表
 
-![](RackMultipart20210708-4-1yaem2y_html_2394bc98712412a2.png)
+![image](https://user-images.githubusercontent.com/58978356/124966976-76362000-e056-11eb-89e8-c38fde76fe46.png)
 
 #### 增加商品
 
-![](RackMultipart20210708-4-1yaem2y_html_f582e6890120a189.png)
+![image](https://user-images.githubusercontent.com/58978356/124966989-7c2c0100-e056-11eb-9149-966725d08bab.png)
 
 #### 搜索商品
 
-![](RackMultipart20210708-4-1yaem2y_html_e8d9f8387306c376.png)
+![image](https://user-images.githubusercontent.com/58978356/124967019-82ba7880-e056-11eb-8d79-5cec5a693b4c.png)
 
 #### 订单列表
-
-![](RackMultipart20210708-4-1yaem2y_html_19612a4ba3d15b97.png)
+![image](https://user-images.githubusercontent.com/58978356/124967028-864dff80-e056-11eb-8e90-7ca4204faeb7.png)
 
 #### 种类列表
 
-![](RackMultipart20210708-4-1yaem2y_html_aefd5273be5a9f83.png)
+![image](https://user-images.githubusercontent.com/58978356/124967041-8a7a1d00-e056-11eb-886f-a197dfdf2292.png)
 
 Tip: 种类为二级目录，增加操作需要修改新增节点名称方可进行增加
