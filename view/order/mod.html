@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <form class="layui-form" lay-filter="order">
+        <table class="layui-table" id="order">
+            <tr>
+                <td>订单id:</td>
+                <td>
+                    <input type="text" name="order_id" id="order_id" autocomplete="off" class="layui-input" readonly>
+                </td>
+                <td>用户id:</td>
+                <td name="user_id">
+                    <input type="text" name="user_id" id="user_id" autocomplete="off" class="layui-input" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>下单日期</td>
+                <td id="time">123123</td>
+                <td>快递单号</td>
+                <td>
+                    <input type="text" name="express_number" id="express_number" placeholder="请输入快递单号"
+                        autocomplete="off" class="layui-input" lay-verify="number">
+                </td>
+            </tr>
+            <tr>
+                <td>订单状态</td>
+                <td>
+                    <select id="state" name="state" lay-filter="state">
+                        <option value="0">未发货</option>
+                        <option value="1">已发货</option>
+                        <option value="2">已签收</option>
+                        <option value="3">退货发起</option>
+                        <option value="4">退货中</option>
+                        <option value="5">订单取消</option>
+                        <option value="6">订单完成</option>
+                    </select>
+                </td>
+                <td>电话</td>
+                <td>
+                    <input type="text" name="phone" id="phone" placeholder="请输入快递单号" autocomplete="off"
+                        class="layui-input" lay-verify="number">
+                </td>
+            </tr>
+
+            <tr>
+                <td>地址</td>
+                <td colspan="3">
+                    <input type="text" name="address" id="address" placeholder="请输入快递单号" autocomplete="off"
+                        class="layui-input">
+                </td>
+            </tr>
+        </table>
+        <div class="layui-input-block">
+            <button class="layui-btn layui-btn-sm layui-btn-radius" lay-submit lay-filter="go">立即提交</button>
+            <button id="cancel" class="layui-btn layui-btn-sm layui-btn-radius">取消</button>
+        </div>
+        <h3 style="text-align: center;">订单货物列表</h3>
+        <table class="layui-table" id="order_list" lay-filter="order_list">
+        </table>
+    </form>
+</body>
+<script src="/kit/layui/layui.js"></script>
+<script type="text/html" id="goods_num">
+    <input type="text" 
+    name="" id="" placeholder="数量" autocomplete="off"
+    class="layui-input goods_num" lay-verify="number" value={{d.goods_num}}>
+    <div>
+    </div>
+</script>
+<script type="text/html" id="sale_price">
+    <input type="text" 
+    name="" id="" placeholder="单价" autocomplete="off"
+    class="layui-input sale_price" lay-verify="number" value={{d.sale_price}}>
+</script>
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+  </script>
+<script>
+    function timestampToTime(timestamp) {
+        var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        var D = date.getDate() + ' ';
+        var h = date.getHours() + ':';
+        var m = date.getMinutes() + ':';
+        var s = date.getSeconds();
+        return Y + M + D + h + m + s;
+    }
+
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) { return pair[1]; }
+        }
+        return (false);
+    }
+    
+    layui.use(['table', 'form'], function () {
+        let data;
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+        let order_id = getQueryVariable("order_id");
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/order/v1.api.detail.php',
+            data: {
+                "order_id": order_id
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            form.val("order", { ...data.data[0] });
+            $("#time").text(timestampToTime(data.data[0].order_date));
+            
+            table.render({
+                elem: '#order_list'
+                , data: data.data//数据
+                , page: true//开启分页
+                , cols: [[ //表头
+                    { field: 'goods_id', title: 'ID', width: 80, sort: true, fixed: 'left' }
+                    , { field: 'name', title: '商品名' }
+                    , { field: 'goods_num', title: '数量', width: 80, sort: true, templet: "#goods_num" }
+                    , { field: 'sale_price', title: '单价', width: 80, templet: "#sale_price" }
+                    , { field: 'operation', title: '操作', templet: "#bar" }
+                ]]
+            });
+            // console.log(data);
+        })
+        $("#cancel").on("click",function(){
+            let index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭    
+            return false;
+        })
+        form.on('submit(go)',function(data){
+            $.ajax({
+                    type: 'post',
+                    url: '/php/api/order/v1.api.mod.php',
+                    data: {
+                        ...data.field,
+                        "type":4
+                    },
+                    dataType: 'json'
+            }).done(data=>{
+                console.log(data);
+                if(data.code == 200)
+                {
+                    layer.msg("修改成功");
+                    setTimeout(()=>{
+                        window.parent.location.reload();
+                    },300)
+                    // let index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    // parent.layer.close(index); //再执行关闭 
+                }
+            })
+            return false;
+        })
+
+        table.on('tool(order_list)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                $.ajax({
+                    type: 'post',
+                    url: '/php/api/order/v1.api.mod.php',
+                    data: {
+                        "detail_id": data.detail_id,
+                        "type":6
+
+                    },
+                    dataType: 'json'
+                }).done(data=>{
+                    if(data.code == 200)
+                    {
+                        layer.msg("删除成功");
+                        obj.del();
+                    }
+                })
+            } else if (obj.event === 'edit') {
+                let sale_price = $(obj.tr).find(".sale_price").val();
+                let goods_num = $(obj.tr).find(".goods_num").val();
+                $.ajax({
+                    type: 'post',
+                    url: '/php/api/order/v1.api.mod.php',
+                    data: {
+                        "detail_id": data.detail_id,
+                        "goods_num": goods_num,
+                        "sale_price": sale_price,
+                        "type":5
+                    },
+                    dataType: 'json'
+                }).done(data=>{
+                    console.log(data);
+                    if(data.code == 200)
+                    {
+                        layer.msg("修改成功");
+                    }
+                }).fail(()=>{
+                    // console.log(data.detail_id);
+                    // console.log(data.goods_num);
+                    // console.log(data.sale_price);
+                })
+
+                // layer.alert('编辑行：<br>' + JSON.stringify(data))
+            }
+        });
+    })
+
+</script>
+
+</html>

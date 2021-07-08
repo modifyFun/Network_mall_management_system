@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <style>
+        .content {
+            padding-top: 26px;
+            width: 98%;
+
+        }
+    </style>
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div class="content" id="content">
+        <form class="layui-form" lay-filter="modform">
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" required lay-verify="required" placeholder="请输入商品名"
+                        autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品图片</label>
+                <div class="layui-upload-drag" id="myfile">
+                    <i class="layui-icon"></i>
+                    <p>点击上传，或将文件拖拽到此处</p>
+                    <div class="layui-hide" id="uploadDemoView">
+                        <hr>
+                        <img id="myimg" alt="上传成功后渲染" style="max-width: 196px">
+                    </div>
+                    <input type="hidden" name="goods_img" id="good_img">
+                    <input type="hidden" name="old_img" id="old_img">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">进货价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="goods_price" required lay-verify="required|number" placeholder="请输入进货价格"
+                        autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">￥</div>
+                <label class="layui-form-label">市场价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="shop_price" required lay-verify="required|number" placeholder="请输入市场价格"
+                        autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">￥</div>
+                <label class="layui-form-label">销售价格</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="sale_price" required lay-verify="required|number" placeholder="请输入销售价格"
+                        autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">￥</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">库存</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="inventor" required lay-verify="required|number" placeholder="请输入库存"
+                        autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">件</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品类别</label>
+                <div class="layui-input-inline">
+                    <select id="category_parent" name="parent_id" lay-verify="required" lay-search lay-filter="parent">
+                        <option value="">请选择父类别</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select name="category_id" id="category_child" lay-verify="required" lay-search>
+                        <option value="">请选择子类别</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品状态</label>
+                <div class="layui-input-block">
+                    <select name="state" lay-verify="required">
+                        <option value="1">在售</option>
+                        <option value="2">缺货</option>
+                        <option value="3">下架</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">简介</label>
+                <div class="layui-input-block">
+                    <textarea name="intro" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">详情</label>
+                <div class="layui-input-block">
+                    <textarea name="detail" placeholder="请输入内容" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="go">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script src="/kit/layui/layui.js"></script>
+
+    <script>
+        //JavaScript代码区域
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) { return pair[1]; }
+            }
+            return (false);
+        }
+        layui.use(['form', 'upload'], function () {
+            let form = layui.form;
+            let $ = layui.jquery, upload = layui.upload;
+            let good_id = getQueryVariable('goods_id');
+            let category;
+            categorySelect();
+            rederDate() ;
+            //类别联动
+            function categorySelect() {
+                $.ajax({
+                    type: 'GET',
+                    url: '/php/api/category/v1.api.list.php',
+                    dataType: 'json'
+                }).done(function (response) {
+                    category = response.data;
+                    $("#category_parent").empty();
+                    $("#category_parent").append('<option value="">请选择父类别</option>');
+
+                    category.forEach((val => {
+                        if (val.category_grade == 1)
+                            $("#category_parent").append('<option value="' + val.category_id + '">' + val.category_name + '</option>');
+                    }));
+                    form.render('select');
+                }).fail(function (xhr, status) {
+                    console.log("检查失败了" + status + xhr);
+                });
+            }
+            //监听 select
+            form.on('select(parent)', function (data) {
+                rederChild(category);
+            });
+
+            //渲染二级选项
+            function rederChild(category)
+            {
+                $("#category_child").html(" ");
+                category.forEach((val => {
+                    if (val.parent_id ==  $("#category_parent").val() && val.category_grade == 2)
+                        $("#category_child").append('<option value="' + val.category_id + '">' + val.category_name + '</option>');
+                }));
+                form.render('select');
+            }
+
+            // 渲染商品数据
+            function rederDate() {
+                let load = layer.load(2,{time:5*1000});
+                $.ajax({
+                    type: 'GET',
+                    url: '/php/api/goods/v1.api.detail.php',
+                    data: {
+                        "goods_id": good_id
+                    },
+                    dataType: 'json'
+                }).done(function (data) {
+                    mydata = data.data[0];
+                    form.val("modform", { 
+                        ...mydata,
+                    });
+                    rederChild(category);
+                    $("#category_child").val(mydata.category_id);
+                    layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', mydata.goods_img);
+                    
+                    $("#old_img").val(mydata.goods_img);
+                    form.render();
+                    layer.close(load);
+                }).fail(function(){
+                    layer.msg("加载失败");
+                });
+            }
+
+            //提交表单
+            form.on('submit(go)', function (data) {
+                let loading = layer.load(2, { time: 3 * 1000 });
+                // console.log(data.field);
+                // 发送 POST 请求
+                $.ajax({
+                    type: 'POST',
+                    url: '/php/api/goods/v1.api.modgoods.php',
+                    data: { ...data.field ,modType:1,goods_id:good_id},
+                    dataType: 'json'
+                }).done(function (data) {
+                    // console.log(data);
+                    if (data.code == 200) {
+                        //模拟提交加载
+                        setTimeout(function () {
+                            layer.close(loading);
+                            layer.msg('商品修改成功', { icon: 1 });
+                            setTimeout(
+                                () => {
+                                    window.history.back(-1); 
+                                },
+                                300
+                            )
+                        }, 500);
+                    }
+                }).fail(function (xhr, status) {
+                    layer.msg('商品修改失败', { icon: 2 });
+                });
+                return false;
+            });
+            //拖拽上传图片
+            upload.render({
+                elem: '#myfile'
+                , url: '/php/api/upload/v1.api.uploadImg.php'
+                , method: 'post'
+                , data: {
+                    'oldImg': function () {
+                        return $('#old_img').val();
+                    }
+                }
+                , done: function (res) {
+                    layer.msg('图片上传成功');
+                    // console.log(res);
+                    layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.data[2]);
+                    $('#good_img').val(res.data[2]);
+                    $('#old_img').val(res.data[2]);
+
+                }, error: function (index, upload) {
+                    layer.msg('上传失败');
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

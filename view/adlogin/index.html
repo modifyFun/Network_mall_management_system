@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/css/reset.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <title>商城后台管理系统</title>
+</head>
+<body>
+    <div class="container">
+        <div class="form">
+            <div class="form_top">
+                <h2>商城管理系统</h2>
+            </div>
+            <div class="input-group">
+                <label for="user">账号</label>
+                <input type="text" class="textbox" id="user" placeholder="">
+            </div>
+            <div class="input-group">
+                <label for="user">密码</label>
+                <input type="text" class="textbox" id="psw" placeholder="">
+            </div>
+            <div class="input-group">
+                <label for="user">验证码：</label>
+                <input type="text" class="textbox" id="code" placeholder="">
+                <img id="mycode">
+            </div>
+            <div class="btn">
+                <button id="login">登录</button>
+                <span class="space"></span>
+                <button id="reset">重置</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../kit/jq/jquery-3.4.1.min.js"></script>
+<script src="./js/index.js"></script>
+
+</html>

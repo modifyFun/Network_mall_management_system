@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend>分类列表</legend>
+    </fieldset>
+    <div id="test" class="demo-tree"></div>
+</body>
+<script src="/kit/layui/layui.js"></script>
+<script>
+    layui.use(['tree', 'util'], function () {
+        let tree = layui.tree, layer = layui.layer, util = layui.util, $ = layui.jquery;
+        let parent_id;
+        let parent_grade;
+
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/category/v1.api.list.php',
+            dataType: 'json'
+        }).done((data) => {
+            // console.log(data.data);
+            let res = data.data;
+            let mydata = [
+                {
+                    title: "根",
+                    id: -1,
+                    category_grade: 0,
+                    children: []
+                }
+            ];
+            //一级
+            res.forEach(val => {
+                // console.log(val);
+                if (val.category_grade == 1) {
+                    let temp = {
+                        title: val.category_name,
+                        id: val.category_id,
+                        category_grade: val.category_grade,
+                        children: []
+                    };
+                    mydata[0].children.push(temp);
+                }
+                else if (val.category_grade == 2) {
+                    //二级
+                    mydata[0].children.forEach(v => {
+                        if (v.id == val.parent_id) {
+                            let temp = {
+                                title: val.category_name,
+                                id: val.category_id,
+                                category_grade: val.category_grade,
+                                children: []
+                            };
+                            v.children.push(temp);
+                        }
+                    })
+                }
+
+                tree.render({
+                    elem: '#test'
+                    , data: mydata
+                    , edit: ['add', 'update'] //操作节点的图标
+                    , click: function (obj) {
+                        // layer.msg(obj.data);
+                    }
+                    , operate: function (obj) {
+                        var type = obj.type; //得到操作类型：add、update、
+                        var data = obj.data; //得到当前节点的数据
+                        var elem = obj.elem; //得到当前节点元素
+
+                        console.log(type);
+                        if (type == 'add') {
+                            parent_id = data.id;
+                            parent_grade = data.category_grade;
+                            console.log(data);
+                            // console.log(parent);
+                            // console.log(parent);
+                        }
+                        if (type == 'update') {
+                            let title = data.title;
+                            // console.log(data);
+                            if (data.id) {
+                                //修改
+                                $.ajax({
+                                    type: 'post',
+                                    url: '/php/api/category/v1.api.mod.php',
+                                    data: {
+                                        category_name: title,
+                                        category_id: data.id
+                                    },
+                                    dataType: 'json'
+                                }).done(data=>{
+                                    if (data.code == 200)
+                                        layer.msg("修改成功");
+                                });
+                            } else {
+                                //添加
+                                $.ajax({
+                                    type: 'post',
+                                    url: '/php/api/category/v1.api.add.php',
+                                    data: {
+                                        category_name: title,
+                                        category_grade: (parseInt(parent_grade) + 1),
+                                        parent_id: parent_id
+                                    },
+                                    dataType: 'json'
+                                }).done(mydata => {
+                                    console.log(mydata);
+                                    if (mydata.code == 200) {
+                                        // $(elem).attr('data-id',mydata.data[0].maxid);
+                                        // obj.data = mydata.data[0].maxid;
+                                        layer.msg("添加成功");
+                                        setTimeout(() => {
+                                            window.location.reload();
+                                        },500)
+                                        // tree.reload(parent_id, {
+                                        //     //新的参数
+                                        // });
+                                        // 
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
+            });
+        })
+    })
+</script>
+
+</html>

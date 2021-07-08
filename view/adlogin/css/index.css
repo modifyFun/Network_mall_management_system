@@ -1,0 +1,72 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    background-image: url("../img/okhompcv.jpeg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% 100%;
+    overflow: hidden;
+}
+
+.container .form {
+    width: 30vw;
+    padding: 30px;
+    margin: 20vh auto;
+    background-color: rgba(3, 4, 77, 0.7);
+    border: 1px solid rgb(1, 2, 53);
+    border-radius: 10px;
+    color: white;
+}
+
+.container .form .form_top {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.container .form .form_top h2 {
+    font-size: 2.6vw;
+}
+
+.container .form .input-group {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.container .form label {
+    display: inline-block;
+    font-size: 1.3vw;
+    line-height: 38px;
+    width: 6vw;
+}
+
+.container .form .textbox {
+    flex: 1;
+    padding: 10px;
+    height: 1.6vh;
+    outline: none;
+    border: 1px solid #cccccc;
+    min-width: 10px;
+    border-radius: 8px;
+}
+
+.container .form #mycode {
+    margin-left: 20px;
+    width: 8vw;
+    height: 6vh;
+}
+
+.container .form .btn {
+    display: flex;
+    justify-content: center;
+}
+
+.container .form .btn button {
+    width: 100px;
+    height: 30px;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+}
+
+.container .form .btn .space {
+    width: 20px;
+}

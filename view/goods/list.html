@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+    <style>
+        h2{
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>商品列表</h2>
+    <table class="layui-hide" id="mygoods" lay-filter="mygoods"></table>
+</body>
+
+<script type="text/html" id="state">
+    {{#  if(d.state == 1){ }}
+    <button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">在售</button>
+    {{#  } }} 
+    {{#  if(d.state == 2){ }}
+    <button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-danger">缺货</button>
+    {{#  } }} 
+    {{#  if(d.state == 3){ }}
+    <button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-disabled">下架</button>
+    {{#  } }} 
+</script>
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">下架</a>
+</script>
+
+
+<script src="/kit/layui/layui.js"></script>
+<script>
+    layui.use('table', function () {
+        let data;
+        let table = layui.table;
+        let $ = layui.jquery;
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/goods/v1.api.goodslist.php',
+            data: {
+                startPage: 0,
+                pageSize: 10,
+                type: 1
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            // data = data;
+            console.log(data);
+            //展示已知数据
+            table.render({
+                elem: '#mygoods',
+                cols: [[ //标题栏
+                    { field: 'goods_id', title: 'ID', sort: true },
+                    { field: 'name', title: '商品名', },
+                    { field: 'goods_price', title: '进货价格', },
+                    { field: 'sale_price', title: '销售价格', sort: true },
+                    { field: 'inventor', title: '库存', },
+                    { field: 'sale_num', title: '销量', sort: true },
+                    { field: 'intro', title: '简介', },
+                    { field: 'state', title: '状态', templet: '#state' },
+                    { field: 'operation', title: '操作', templet: '#bar', width: 180 },
+                ]]
+                , data: data.data
+                //,skin: 'line' //表格风格
+                , even: true
+                , page: {
+                    count: data.size
+                }
+                //,limits: [5, 7, 10]
+                , limit: 10 //每页默认显示的数量
+            });
+            table.on('tool(mygoods)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'detail') {
+                    layer.open({
+                        title: '商品详情',
+                        type: 2,
+                        content: '/view/goods/detail.html?good_id=' + data.goods_id,
+                        area: ['800px', '600px']
+                    });
+                } else if (obj.event === 'del') {
+                    layer.confirm('真的下架id为' + data.goods_id + "的商品吗", function (index) {
+                        $.ajax({
+                            type: 'post',
+                            url: '/php/api/goods/v1.api.soldout.php',
+                            data: {
+                                goods_id: data.goods_id
+                            },
+                            dataType: 'json'
+                        }).done(function(data){
+                            console.log(data);
+                            window.location.reload();
+                        }).fail(function(){
+                            console.log(goods_id)
+                        });
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'edit') {
+                    // layer.alert('编辑行：<br>' + JSON.stringify(data))
+                    window.location.href="/view/goods/mod.html?goods_id="+data.goods_id;
+                }
+            });
+        })
+            .fail(function (xhr, status) {
+                console.log("检查失败了" + status + xhr);
+            });
+
+
+
+    });
+</script>
+
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+    <style>
+        .layui-form {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="layui-form">
+        <!-- 提示：如果你不想用form，你可以换成div等任何一个普通元素 -->
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-inline">
+                <select lay-filter="search" name="type">
+                    <option value="1">根据订单ID搜索</option>
+                    <option value="2">根据用户ID搜索</option>
+                </select>
+            </div>
+            <div class="layui-input-inline search" id="search_detail">
+                <input type="text" name="search" placeholder="请输入搜索内容" autocomplete="off" class="layui-input">
+            </div>
+            <button class="layui-btn" lay-submit lay-filter="go">立即搜索</button>
+        </div>
+    </form>
+    <table class="layui-hide" id="myorder" lay-filter="myorder"></table>
+</body>
+
+<script type="text/html" id="state">
+    <!-- 0:未发货 1：已发货 2:已签收 3：退货发起 4：退货中 5：订单取消 6：订单完成 -->
+    {{#  if(d.state == 0){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius  layui-bg-cyan">未发货</button>
+{{#  } }}
+{{#  if(d.state == 1){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-blue">已发货</button>
+{{#  } }}
+{{#  if(d.state == 2){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">已签收</button>
+{{#  } }}
+{{#  if(d.state == 3){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-orange">退货发起</button>
+{{#  } }}
+{{#  if(d.state == 4){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-gray">退货中</button>
+{{#  } }}
+{{#  if(d.state == 5){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-disabled">订单取消</button>
+{{#  } }}
+{{#  if(d.state == 6){ }}
+<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">订单完成</button>
+{{#  } }}
+</script>
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>
+    {{#  if(d.state == 0){ }}
+        <a class="layui-btn layui-btn-xs" lay-event="express">发货</a>
+    {{#  } }} 
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="edit">编辑</a>
+</script>
+
+
+<script src="/kit/layui/layui.js"></script>
+<script>
+    layui.use(['table', 'form'], function () {
+        let data;
+        var form = layui.form;
+        let table = layui.table;
+        let $ = layui.jquery;
+
+        form.on('submit(go)', function (data) {
+            // console.log(data.field);
+            if (!data.field.type || !data.field.search) {
+                layer.msg("参数不能为空");
+                return false;
+            }
+            $.ajax({
+                type: 'GET',
+                url: '/php/api/order/v1.api.search.php',
+                data: {
+                    search: data.field.search,
+                    type: data.field.type
+                },
+                dataType: 'json'
+            }).done(function (data) {
+                // data = data;
+                // console.log(data);
+                //展示已知数据
+                table.render({
+                    elem: '#myorder',
+                    cols: [[ //标题栏
+                        { field: 'order_id', title: 'ID', sort: true },
+                        { field: 'user_id', title: '用户id', },
+                        { field: 'price', title: '总价格', },
+                        { field: 'express_number', title: '快递单号', sort: true },
+                        { field: 'express_date', title: '发货时间', templet: '#express' },
+                        { field: 'address', title: '地址', sort: true },
+                        { field: 'phone', title: '联系电话', },
+                        { field: 'state', title: '状态', templet: '#state' },
+                        { field: 'order_date', title: '下单时间', templet: '#order' },
+                        { field: 'operation', title: '操作', templet: '#bar', width: 180 },
+                    ]]
+                    , data: data.data
+                    , even: true
+                    , page: {
+                        count: data.length
+                    }
+                    , limit: 10 //每页默认显示的数量
+                });
+
+                table.on('tool(myorder)', function (obj) {
+                    var data = obj.data;
+                    if (obj.event === 'detail') {
+                        layer.open({
+                            title: '订单详情',
+                            type: 2,
+                            content: '/view/order/detail.html?order_id=' + data.order_id,
+                            area: ['800px', '600px']
+                        });
+                    } else if (obj.event === 'edit') {
+                        layer.open({
+                            title: '修改订单',
+                            type: 2,
+                            content: '/view/order/mod.html?order_id=' + data.order_id,
+                            area: ['800px', '600px']
+                        });
+
+                    } else if (obj.event === 'express') {
+                        layer.open({
+                            content: `
+                            <form class="layui-form">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">输入框</label>
+                                    <div class="layui-input-inline">
+                                    <input type="text" name="" id="num" placeholder="请输入快递单号" autocomplete="off" class="layui-input" lay-verify="number">
+                                    </div>
+                                </div>
+                            </form>
+                        `
+                            ,
+                            title: "填写快递单"
+                            , btn: ['发货', '取消']
+                            , yes: function (index, layero) {
+                                //按钮【按钮一】的回调
+                                $num = parseInt($("#num").val());
+                                $.ajax({
+                                    type: 'post',
+                                    url: '/php/api/order/v1.api.mod.php',
+                                    data: {
+                                        type: 1,
+                                        express_number: $num,
+                                        order_id: data.order_id
+                                    },
+                                    dataType: 'json'
+                                }).done(function (data) {
+                                    if (data.code == 200) {
+                                        layer.msg("发货成功");
+                                        window.location.reload();
+                                    }
+                                }).fail(function () {
+                                    console.log(data.goods_id)
+                                })
+                            }
+                        });
+                    }
+                });
+            })
+                .fail(function (xhr, status) {
+                    console.log("检查失败了" + status + xhr);
+                });
+
+            return false; //阻止表单跳转。
+        });
+    }); 
+</script>
+
+</html>

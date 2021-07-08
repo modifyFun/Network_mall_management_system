@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <link rel="stylesheet" href="/view/adhome/css/home.css">
+</head>
+
+<body>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>商城概况</legend>
+    </fieldset>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space20">
+            <div class="layui-col-md3 layui-col-sm6 layui-col-xs6">
+                <a href="/view/goods/list.html">
+                    <div class="layui-bg-blue info-box">
+                        <p class="title">
+                            <i class="layui-icon layui-icon-home">
+                            </i>
+                            <span>商品数量</span>
+                        </p>
+                        <p class="num" id="goods">16232</p> 
+                    </div>
+                </a>
+            </div>
+            <div class="layui-col-md3 layui-col-sm6 layui-col-xs6">
+                <a href="#">
+                    <div class="layui-bg-cyan info-box">
+                        <p class="title">
+                            <i class="layui-icon layui-icon-friends"></i>
+                            <span>用户个数</span>
+                        </p>
+                        <p class="num layui-elip" id="user">16</p> 
+                    </div>
+                </a>
+            </div>
+            <div class="layui-col-md3 layui-col-sm6 layui-col-xs6">
+                <a href="/view/order/list.html">
+                    <div class="layui-bg-green info-box">
+                        <p class="title">
+                            <i class="layui-icon layui-icon-rmb"></i>
+                            <span>销售金额</span>
+                        </p>
+                        <p class="num layui-elip" id="money">16</p> 
+                    </div>
+                </a>
+                
+            </div>
+            <div class="layui-col-md3 layui-col-sm6 layui-col-xs6">
+                <a href="/view/order/list.html">
+                    <div class="layui-bg-orange info-box">
+                        <p class="title">
+                            <i class="layui-icon layui-icon-cart-simple"></i>
+                            <span>订单数量</span>
+                        </p>
+                        <p class="num layui-elip" id="orders">1</p> 
+                    </div>
+                </a>
+                
+            </div>
+        </div>
+        <hr class="layui-bg-green">
+        <div class="layui-row layui-col-space20">
+            <div class="layui-col-md3 layui-col-sm3">
+                <div>
+                    <div id="clock"></div>
+                    <div id="date"></div>
+                </div>
+            </div>
+            <div class="layui-col-md3 layui-col-sm3">
+                <div class="ban">
+                    <h3>网站信息</h3>
+                    <div class="ban-content">
+                        <div class="logo">
+                            <img class="layui-circle" src="/view/public/img/logo.jpg" width="120px">
+                        </div>
+                        <div class="shop-info">
+                            <p><span>商城名称:</span>云罗商贸</p>
+                            <p><span>商城类型:</span>综合类</p>
+                            <p><span>商城许可:</span>XK88888888</p>
+                        </div>
+                        <div class="operation">
+                            <a href="/view/goods/search.html" class="layui-btn layui-btn-sm layui-btn-radius">搜索商品</a>
+                            <a href="/view/order/search.html" class="layui-btn layui-btn-sm layui-btn-radius">查询订单</a>
+                            <a href="/view/order/noexpress.html" class="layui-btn layui-btn-sm layui-btn-radius">订单发货</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md6 layui-col-sm6">
+                <div class="ban">
+                    <h3>缺货商品</h3>
+                    <iframe src="/view/goods/stockout.html"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+<script src="/kit/layui/layui.js"></script>
+<script src="/view/adhome/js/date.js"></script>
+<script src="/view/adhome/js/home.js"></script>
+
+</html>

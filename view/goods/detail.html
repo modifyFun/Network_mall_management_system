@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 760px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="content">
+
+
+    </div>
+
+</body>
+<script src="/kit/layui/layui.js"></script>
+<script>
+
+
+    layui.use("table", function () {
+
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                console.log(pair[0]);
+                if (pair[0] == variable) { return pair[1]; }
+            }
+            return (false);
+        }
+
+        let $ = layui.jquery;
+        let good_id = getQueryVariable('good_id');
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/goods/v1.api.detail.php',
+            data: {
+                "goods_id": good_id
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            // console.log(data);
+            rederdatail(data.data[0]);
+        })
+
+
+        function rederdatail(data) {
+            if (data) {
+                let state;
+                // console.log(data.state);
+                if (data.state == '1') {
+                    state = `<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">在售</button>`;
+                }
+                else if (data.state == '2') {
+                    state = `<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-danger">缺货</button>`;
+                }
+                else if (data.state == '3') {
+                    state = `<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-disabled">下架</button>`;
+                }
+                let html = `
+            <table  class="layui-table" lay-skin="line">
+            <tr>
+                <td>商品ID：</td>
+                <td colspan="2">${data.goods_id}</td>
+                <td>商品分类：</td>
+                <td colspan="2">${data.name}</td>
+            </tr>
+            <tr>
+                
+            </tr>
+            <tr>
+                <td>进货价格：</td>
+                <td>${data.goods_price}</td>
+                <td>市场价格：</td>
+                <td>${data.shop_price}</td>
+                <td>销售价格：</td>
+                <td>${data.sale_price}</td>
+            </tr>
+            <tr>
+                <td>库存</td>
+                <td colspan="2">${data.inventor}</td>
+                <td>销量</td>
+                <td colspan="2">${data.sale_num}</td>
+            </tr>
+            <tr>
+                <td>商品状态</td>
+                <td colspan="5">${state}</td>
+            </tr>
+            <tr>
+                <td>商品图片</td>
+                <td colspan="5">
+                    <img src="${data.goods_img}" width="200px"/>    
+                </td>
+            </tr>
+            <tr>
+                <td>简介</td>
+                <td colspan="5">${data.intro}</td>
+            </tr>
+            <tr>
+                <td>详细介绍</td>
+                <td colspan="5">${data.detail}</td>
+            </tr>
+        </table>
+            `;
+                $("#content").html(html);
+            }
+        }
+
+    });
+
+
+
+
+</script>
+
+</html>

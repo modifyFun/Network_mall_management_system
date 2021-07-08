@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+</head>
+
+<body>
+    <table class="layui-table" id="order">
+        <tr>
+            <td>订单id:</td>
+            <td></td>
+            <td>用户id:</td>
+            <td>12</td>
+        </tr>
+        <tr>
+            <td>下单日期</td>
+            <td>123123</td>
+            <td>快递单号</td>
+            <td>123123</td>
+        </tr>
+        <tr>
+            <td>订单状态</td>
+            <td colspan="3">订单状态</td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center">订单货物列表</td>
+        </tr>
+        <tr>
+            <td>商品名</td>
+            <td>数量</td>
+            <td>单价</td>
+            <td>合计</td>
+        </tr>
+        <tr>
+            <td>撒大声地</td>
+            <td>12</td>
+            <td>12</td>
+            <td>12</td>
+        </tr>
+    </table>
+</body>
+
+<script src="/kit/layui/layui.js"></script>
+<script>
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] == variable) { return pair[1]; }
+        }
+        return (false);
+    }
+    function timestampToTime(timestamp) {
+        var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+        var Y = date.getFullYear() + '-';
+        var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        var D = date.getDate() + ' ';
+        var h = date.getHours() + ':';
+        var m = date.getMinutes() + ':';
+        var s = date.getSeconds();
+        return Y + M + D + h + m + s;
+    }
+
+    layui.use("table", function () {
+        let $ = layui.jquery;
+        let order_id = getQueryVariable('order_id');
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/order/v1.api.detail.php',
+            data: {
+                "order_id": order_id
+            }, dataType: 'json'
+        }).done(function (data) { // console.log(data);
+            let state;
+            switch(parseInt(data.data[0].state))
+            {
+                case 0:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius  layui-bg-cyan">未发货</button>`;
+                break;
+                case 1:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-blue">已发货</button>`;
+                break;
+                case 2:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">已签收</button>`;
+                break;
+                case 3:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-orange">退货发起</button>`;
+                break;
+                case 4:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-bg-gray">退货中</button>`;
+                break;
+                case 5:
+                    state=`<button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius layui-btn-disabled">订单取消</button>`;
+                break;
+                case 6:
+                    state=` <button type="button" class="layui-btn  layui-btn-sm  layui-btn-radius">订单完成</button>`;
+                break;
+            }
+            html = `
+                <tr>
+                    <td>订单id:</td>
+                    <td>${data.data[0].order_id}</td>
+                    <td>用户id:</td>
+                    <td>${data.data[0].user_id}</td>
+                </tr>
+                <tr>
+                    <td>下单日期</td>
+                    <td>${timestampToTime(data.data[0].order_date)}</td>
+                    <td>快递单号</td>
+                    <td>${data.data[0].express_number}</td>
+                </tr>
+                <tr>
+                    <td>订单状态</td>
+                    <td>
+                        ${state}
+                    </td>
+                    <td>电话</td>
+                    <td>
+                        ${data.data[0].phone}
+                    </td>
+                </tr>
+                <tr>
+                    <td>地址</td>
+                    <td colsapn="3">
+                        ${data.data[0].address}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" align="center">订单货物列表</td>
+                </tr>
+                <tr>
+                    <td>商品名</td>
+                    <td>数量</td>
+                    <td>单价</td>
+                    <td>合计</td>
+                </tr>
+            `;
+            let countMoney =0;
+            let countNum = 0;
+            data.data.forEach(v => {
+                // console.log(v);
+                countMoney +=parseInt(v.sale_price) * v.goods_num;
+                countNum += parseInt(v.goods_num);
+                html += `
+                <tr>
+                    <td>${v.name}</td>
+                    <td>${v.goods_num}</td>
+                    <td>${v.sale_price}</td>
+                    <td>${v.sale_price * v.goods_num}</td>
+                </tr>
+                `;
+            });
+            html +=`
+                <tr>
+                    <td>总数量</td>
+                    <td>${countNum}</td>
+                    <td>总价格</td>
+                    <td>${countMoney}</td>
+                </tr>
+            `; 
+
+
+            $("#order").html(html);
+        })
+    });
+</script>
+
+</html>

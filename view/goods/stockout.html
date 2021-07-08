@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <title>Document</title>
+    <style>
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>缺货列表</h2>
+    <table class="layui-hide" id="mygoods" lay-filter="mygoods"></table>
+</body>
+
+
+<script type="text/html" id="bar">
+    <a class="layui-btn layui-btn-xs" lay-event="addgoods">进货</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">下架</a>
+</script>
+
+
+<script src="/kit/layui/layui.js"></script>
+<script>
+    layui.use('table', function () {
+        let data;
+        let table = layui.table;
+        let $ = layui.jquery;
+        $.ajax({
+            type: 'GET',
+            url: '/php/api/goods/v1.api.goodslist.php',
+            data: {
+                type: 3
+            },
+            dataType: 'json'
+        }).done(function (data) {
+            // data = data;
+            console.log(data);
+            //展示已知数据
+            table.render({
+                elem: '#mygoods',
+                cols: [[ //标题栏
+                    { field: 'goods_id', title: 'ID', sort: true },
+                    { field: 'name', title: '商品名', },
+                    { field: 'goods_price', title: '进货价格', },
+                    { field: 'sale_price', title: '销售价格', sort: true },
+                    { field: 'inventor', title: '库存', },
+                    { field: 'sale_num', title: '销量', sort: true },
+                    { field: 'intro', title: '简介', },
+                    { field: 'operation', title: '操作', templet: '#bar', width: 180 },
+                ]]
+                , data: data.data
+                //,skin: 'line' //表格风格
+                , even: true
+                , page: {
+                    count: data.size
+                }
+                //,limits: [5, 7, 10]
+                , limit: 10 //每页默认显示的数量
+            });
+            table.on('tool(mygoods)', function (obj) {
+                var data = obj.data;
+                if (obj.event === 'del') {
+                    layer.confirm('真的下架id为' + data.goods_id + "的商品吗", function (index) {
+                        // obj.del();
+                        $.ajax({
+                            type: 'post',
+                            url: '/php/api/goods/v1.api.soldout.php',
+                            data: {
+                                goods_id: data.goods_id
+                            },
+                            dataType: 'json'
+                        }).done(function(data){
+                            console.log(data);
+                            obj.del();
+                        }).fail(function(){
+                            console.log(goods_id)
+                        });
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'addgoods') {
+                    layer.open({
+                        content: `
+                            <form class="layui-form">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">输入框</label>
+                                    <div class="layui-input-inline">
+                                    <input type="text" name="" id="num" placeholder="请输入进货数量" autocomplete="off" class="layui-input" lay-verify="number">
+                                    </div>
+                                </div>
+                            </form>
+                        `
+                        ,title:"进货"
+                        , btn: ['进货', '取消']
+                        , yes: function (index, layero) {
+                            //按钮【按钮一】的回调
+                            $num = parseInt($("#num").val()) + parseInt(data.inventor);
+                            if ($num) {
+                                $.ajax({
+                                    type: 'post',
+                                    url: '/php/api/goods/v1.api.modgoods.php',
+                                    data: {
+                                        modType: 3,
+                                        inventor: ($num),
+                                        goods_id: data.goods_id
+                                    },
+                                    dataType: 'json'
+                                }).done(function (data) {
+                                    if (data.code == 200) {
+                                        layer.msg("进货成功");
+                                        window.parent.location.reload();
+                                    }
+                                }).fail(function () {
+                                    console.log(data.goods_id)
+                                })
+                            }
+                        }
+                    });
+                }
+            });
+        })
+            .fail(function (xhr, status) {
+                console.log("检查失败了" + status + xhr);
+            });
+
+
+
+    });
+</script>
+
+</html>

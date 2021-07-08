@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>商城管理系统</title>
+    <link rel="stylesheet" href="/kit/layui/css/layui.css">
+    <style>
+        .layui-body {
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+        }
+        .layui-layout-admin .layui-logo
+        {
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">云罗商贸</div>
+            <!-- 头部区域（可配合layui已有的水平导航） -->
+          
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img src="/view/public/img/logo.jpg" class="layui-nav-img">
+                        管理员
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="">基本资料</a></dd>
+                        <dd><a href="">安全设置</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="javascript:;" id="logout">注销登录</a></li>
+            </ul>
+        </div>
+        <div class="layui-side layui-bg-black">
+            <div class="layui-side-scroll">
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    <li class="layui-nav-item"><a href="">系统首页</a></li>
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="" href="javascript:;">商品管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/view/goods/list.html" target="iframe_a">商品列表</a></dd>
+                            <dd><a href="/view/goods/stockout.html" target="iframe_a">缺货列表</a></dd>
+                            <dd><a href="/view/goods/add.html" target="iframe_a">增加商品</a></dd>
+                            <dd><a href="/view/goods/search.html" target="iframe_a">搜索商品</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">订单管理</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/view/order/list.html" target="iframe_a">订单列表</a></dd>
+                            <dd><a href="/view/order/noexpress.html" target="iframe_a">未发货订单</a></dd>
+                            <dd><a href="/view/order/search.html" target="iframe_a">订单搜索</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">商品类别</a>
+                        <dl class="layui-nav-child">
+                            <dd><a href="/view/category/list.html" target="iframe_a">类别列表</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="layui-body">
+            <iframe name="iframe_a" src="/view/adhome/home.html" frameborder="0">
+            </iframe>
+        </div>
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            © www.myshop.com
+        </div>
+    </div>
+    <script src="/kit/layui/layui.js"></script>
+    <script>
+        //JavaScript代码区域
+        layui.use(['element','layer'], function () {
+            let element = layui.element;
+            let layer = layui.layer;
+            let $ =layui.jquery;
+            $("#logout").click(function(){
+                $.ajax({
+                    type: 'GET',
+                    url: '/php/api/login/v1.api.adlogout.php',
+                    dataType: 'json'
+                }).done(data=>{
+                    console.log(data);
+                    if(data.code == 200)
+                    {
+                        layer.msg('登出');
+                        window.location.href="/view/adlogin"
+                    }
+                })
+            })
+        });
+    </script>
+</body>
+
+</html>
